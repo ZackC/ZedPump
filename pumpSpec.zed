@@ -204,7 +204,7 @@ When an electrical failure happens, if the pump battery is properly charged, the
   powerState = wall\_power \\
   (batteryState = charged \land powerState' = battery\_power) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
-  (lines' = lines) \land (batteryState' = batteryState)
+  (lines' = lines) \land   (batteryState' = batteryState) \land  (lockedState'= lockedState)
 \end{schema}
 
 %Define the error condition where electrical failure's pre-powerState
@@ -229,7 +229,8 @@ When the pump is out of battery, it loses power.
   batteryState = charged \\
   powerState' = no\_power \\
   batteryState = not\_properly\_charged \\
-  lines' = lines
+  lines' = lines\\
+  lockedState'= lockedState
 \end{schema}
 
 %Define the error condition where OutOfBattery's pre-powerState
@@ -252,7 +253,8 @@ This schema defines the charge battery operation.
 \where
   batteryState' = charged \\
   powerState' = powerState \\
-  lines' = lines
+  lines' = lines\\
+  lockedState'= lockedState
 \end{schema}
 
 %Defines error conditions.  ok means action was successful.
@@ -323,9 +325,9 @@ Defines the conditions were the pump is locked
 
 Defines the conditions were the pump is locked
 \begin{schema}{LockPump}
-  pumpIsLocked : LockedState
+  Pump
 \where
-  pumpIsLocked = locked
+  lockedState = locked
 \end{schema}
 
 

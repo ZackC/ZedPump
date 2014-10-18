@@ -18,7 +18,7 @@ correct or blocked and not able to dispense
 
 This type represents the different problems
 possible in the line.  occlusion means the 
-line is plugged or pinched.  out_of_medicine
+line is plugged or pinched.  out\_of\_medicine
 means that the line does not have 
 \begin{zed}
   Problem ::= occlusion | out\_of\_medicine
@@ -182,7 +182,7 @@ meaning: the pump has power if it does not have no power.
   \Delta Pump
 \where
   powerState = wall\_power \\
-  (batteryState = charged \land powerState' = battery\_power) \lor 
+  (batteryState = charged \land powerState' = battery\_power) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
   (lines' = lines) \land (batteryState' = batteryState)
 \end{schema}

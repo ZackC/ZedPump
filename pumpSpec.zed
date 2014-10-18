@@ -62,6 +62,9 @@ no\_power means the device has no power.
 Refill medicine can be done in any power state but DispenseMedicine
 requires power
 
+\begin{zed}
+  BatteryState ::= charged | not\_properly\_charged
+\end{zed}
 
 Defines the conditions were the pump has power:
 meaning: the pump has power if it does not have no power.
@@ -72,15 +75,48 @@ meaning: the pump has power if it does not have no power.
   powerState \neq no\_power
 \end{schema}
 
-%Defines the conditions were the pump loses wall power.
+%This schema defines a pump which contains a certain number
+%of lines and a current power state.
+\begin{schema}{Pump}
+  lines : \seq MedicineLine \\
+  powerState: PowerSupplyState \\
+  batteryState: BatteryState \\
+\where
+  lines \neq \emptyset
+\end{schema}
+
+%Defines the conditions when there is an electrical failure.
 %In that case, the power state will transfer over to 
-%battery power.
-%\begin{schema}{WallPowerLoss}
-  %powerState : PowerSupplyState
-%\where
-%  powerState = wall\_power \\
-%  powerState' = battery\_power
-%\end{schema}
+%battery power if battery is charged, otherwise the pump will
+%lose power.
+\begin{schema}{ElectricalFailure}
+  \Delta Pump
+\where
+  powerState = wall\_power \\
+  (batteryState = charged \land powerState' = battery\_power) \lor 
+  (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
+  (lines' = lines) \land (batteryState' = batteryState)
+\end{schema}
+
+%Define the condition when the battery runs of power
+\begin{schema}{OutOfBattery}
+  \Delta Pump
+\where
+  powerState = battery\_power \\
+  batteryState = charged \\
+  powerState' = no\_power \\
+  batteryState = not\_properly\_charged \\
+  lines' = lines
+\end{schema}
+
+%Define the action of charging battery
+\begin{schema}{ChargeBattery}
+  \Delta Pump
+\where
+  batteryState' = charged \\
+  powerState' = powerState \\
+  lines' = lines
+\end{schema}
 
 
 %Defines error conditions.  ok means action was successful.
@@ -90,38 +126,34 @@ meaning: the pump has power if it does not have no power.
 %\end{zed}
 
 
-This schema defines a pump which contains a certain number
-of lines and a current power state.
-\begin{schema}{Pump}
-  lines : \seq MedicineLine \\
-  powerState: PowerSupplyState
-\where
-  lines \neq \emptyset
-\end{schema}
+
 
 \begin{schema}{InitialSingleLinePump}
-  %MedicineLine \\
-  %lines : \seq MedicineLine \\
-  %lines: \seq \nat \\
-  %powerState: PowerSupplyState \\
-  %temp : MedicineLine 
   Pump \\
   MedicineLine
 \where
-  %temp = \theta InitMedicineLine \\
   lines = \langle (\theta InitMedicineLine) \rangle \\
-  %lines = \langle 1 , 2 \rangle \\
   powerState = wall\_power \\
+  batteryState = not\_properly\_charged \\
 \end{schema}
 
-%\begin{schema}{Pump}
-%  %Pump
-%  line1 : MedicineLine \\
-%  line2 : MedicineLine \\
-%  line3 : MedicineLine \\
-%\where
+\begin{schema}{InitialDoubleLinePump}
+  Pump \\
+  MedicineLine
+\where
+  lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
+  powerState = wall\_power \\
+  batteryState = not\_properly\_charged \\
+\end{schema}
 
-%\end{schema}
+\begin{schema}{InitialTripleLinePump}
+  Pump \\
+  MedicineLine
+\where
+  lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
+  powerState = wall\_power \\
+  batteryState = not\_properly\_charged \\
+\end{schema}
 
 %This schema defines how power effects dispensing medication.
 %Specifically, this case covers the situation where

@@ -383,8 +383,7 @@ Preconditions the pump to be unlocked
 SetRateForLineInPump == SetRate \land PromotionForLine \land IsUnlocked \land HasPower\\
 RefillLineInPump == RefillLine \land PromotionForLine \land IsUnlocked \land HasPower\\
 FixOcclusionInLineInPump == FixOcclusion \land PromotionForLine\\
-DispenceMedicine == RDispenseMedicine \land PromotionForLine \land HasPower\\
-
+DispenseMedicine == RDispenseMedicine \land PromotionForLine \land HasPower\\
 \end{zed}
 
 

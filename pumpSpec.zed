@@ -217,6 +217,8 @@ meaning: the pump has power if it does not have no power.
 
 
 
+%This schema defines a pump with one medicine line
+%in initialized state
 \begin{schema}{InitialSingleLinePump}
   Pump \\
   MedicineLine
@@ -226,6 +228,8 @@ meaning: the pump has power if it does not have no power.
   batteryState = not\_properly\_charged \\
 \end{schema}
 
+%This schema defines a pump with two medicine lines 
+%in initialized state
 \begin{schema}{InitialDoubleLinePump}
   Pump \\
   MedicineLine
@@ -235,6 +239,8 @@ meaning: the pump has power if it does not have no power.
   batteryState = not\_properly\_charged \\
 \end{schema}
 
+%This schema defines a pump with three medicine lines 
+%in initialized state
 \begin{schema}{InitialTripleLinePump}
   Pump \\
   MedicineLine

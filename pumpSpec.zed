@@ -8,6 +8,9 @@
 
 This file covers the infusion pump project in the Models class
 
+\begin{enumerate}
+\item \textbf{Line Specification}
+
 This type represents the different problems
 possible in the line.  occlusion means the 
 line is plugged or pinched.  out\_of\_medicine
@@ -39,7 +42,7 @@ Defines the initial rate when the system initializes
   initRate = 1
 \end{axdef}
 
-This schema represents the current amount of medicine 
+\vspace{1cm}This schema represents the current amount of medicine 
 on a specific line. The invariants ensure that in all
 cases where the line has a problem, the alarm is sounding
 and in all cases where the line has no problems, the alarm
@@ -63,7 +66,7 @@ The initial state of the medicine on a line is to be empty
   currentProblems = \emptyset
 \end{schema}
 
-This function takes a new rate for the machine to dispense
+\vspace{1cm}This function takes a new rate for the machine to dispense
 medicine at and sets it to be the current rate.
 All other variables remain the same.
 \begin{schema}{SetRate}
@@ -76,7 +79,7 @@ All other variables remain the same.
   alarm' = alarm
 \end{schema}
 
-The action modelling refilling the medicine in a line.
+The action modeling refilling the medicine in a line.
 It can be done at any time and fills the medicine 
 back up to the fillAmount.
 \begin{schema}{RefillLine}
@@ -96,13 +99,13 @@ back up to the fillAmount.
   rate' = rate %added this
 \end{schema}
 
-The dispense medicince action dispenses one unit of 
+\vspace{1cm}The dispense medicine action dispenses one unit of 
 medicine per action.  It requires that the amount
 of medicine in the line is greater than 0.
 \begin{schema}{SuccessfulDispenseMedicine}
   \Delta MedicineLine
 \where
-  currentProblems = \emptyset\\
+  currentProblems = \emptyset \\
   medicineAmount > 0 \\
   (medicineAmount \geq rate \land medicineAmount' = medicineAmount - rate) \lor\\ %added this
   (medicineAmount < rate \land medicineAmount' = 0)\\ %added this
@@ -123,8 +126,7 @@ SuccessfulDispenseMedicine schema
   currentProblems' = currentProblems \cup \{occlusion\}  
 \end{schema}
 
-
-This function modles the line attempting to
+This function models the line attempting to
 dispense medicine while the line is out of 
 medicine. 
 \begin{schema}{AttemptDispenseWhenOutOfMedicine} 
@@ -149,15 +151,19 @@ This schema represents the ability of the line to become
 blocked while dispensing but also allows the line to 
 dispense medicince successfully.
 \begin{zed}
-  NonDeterministicDispenseMedicine == SuccessfulDispenseMedicine \lor DispenseMedicineGetsBlocked  
+  NonDeterministicDispenseMedicine == SuccessfulDispenseMedicine \lor \\
+  DispenseMedicineGetsBlocked  
 \end{zed}
 
 This schema represents all possible outcomes when trying to
 dispense medicine under various conditions.
 \begin{zed} 
-  RDispenseMedicine == NonDeterministicDispenseMedicine \lor AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
+  RDispenseMedicine == NonDeterministicDispenseMedicine \lor \\
+  AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
 \end{zed}
 
+\vspace{2cm}
+\item \textbf{Pump Specification}
 PowerSupplyState is the type of power the pump is receiving.
 wall\_power corresponds to getting power from a wall socket,
 battery\_power corresponds to getting power from a battery,
@@ -172,7 +178,8 @@ BatteryState is the possible states that the pump battery could be in.
 \end{zed}
 
 \begin{zed}
-  PumpNotice ::= electrical\_failure\_battery\_mode | electrical\_failure\_no\_battery | none \\
+  PumpNotice ::= electrical\_failure\_battery\_mode | \\
+  electrical\_failure\_no\_battery | none \\
   LockedState ::= locked | unlocked
 \end{zed}
 
@@ -185,7 +192,7 @@ meaning: the pump has power if it does not have no power.
   powerState \neq no\_power
 \end{schema}
 
-This is the schema of a pump. A pump has a sequence of medicine lines, a power state (battery power, wall power, or no power), a batteryState (charged of not properly charged), and pump notice that visually notifies the caregiver, and a lock state.
+\vspace{1cm}This is the schema of a pump. A pump has a sequence of medicine lines, a power state (battery power, wall power, or no power), a batteryState (charged of not properly charged), and pump notice that visually notifies the caregiver, and a lock state.
 %This schema defines a pump which contains a certain number
 %of lines and a current power state and a locked state
 \begin{schema}{Pump}
@@ -198,111 +205,6 @@ This is the schema of a pump. A pump has a sequence of medicine lines, a power s
   lines \neq \emptyset \\
   pumpNotice = none \\
 \end{schema}
-
-When an electrical failure happens, if the pump battery is properly charged, then it starts using battery. Otherwise, it will lose power.
-%Defines the conditions when there is an electrical failure.
-%In that case, the power state will transfer over to 
-%battery power if battery is charged, otherwise the pump will
-%lose power.
-\begin{schema}{ElectricalFailure}
-  \Delta Pump
-\where
-  powerState = wall\_power \\
-  pumpNotice = none \\
-  (batteryState = charged \land powerState' = battery\_power \land \\
-  pumpNotice = electrical\_failure\_battery\_mode) \lor \\
-  (batteryState = not\_properly\_charged \land powerState' = no\_power \land \\
-  pumpNotice = electrical\_failure\_no\_battery) \\
-  (lines' = lines) \land (batteryState' = batteryState) \land (lockedState'= lockedState)
-\end{schema}
-
-%Define the error condition where electrical failure's pre-powerState
-%is not wall\_power
-\begin{schema}{ElectricalFailureWrongPreState}
-  \Xi Pump
-\where
-  (powerState \neq wall\_power) \lor (pumpNotice \neq none)
-\end{schema}
-
-%Define the robust version of electrical failure
-\begin{zed}
-  RElectricalFailure == ElectricalFailure \lor ElectricalFailureWrongPreState
-\end{zed}
-
-When the pump is out of battery, it loses power.
-%Define the condition when the battery runs of power
-\begin{schema}{OutOfBattery}
-  \Delta Pump
-\where
-  powerState = battery\_power \\
-  batteryState = charged \\
-  pumpNotice = electrical\_failure\_battery\_mode \\
-  powerState' = no\_power \\
-  batteryState' = not\_properly\_charged \\
-  pumpNotice' = electrical\_failure\_no\_battery \\
-  lines' = lines\\
-  lockedState'= lockedState
-\end{schema}
-
-%Define the error condition where OutOfBattery's pre-state
-%is not battery\_power or pre-batteryState is not charged
-\begin{schema}{OutOfBatteryWrongPreState}
-  \Xi Pump
-\where
-  (powerState \neq battery\_power) \lor (batteryState \neq charged) \lor \\
-  (pumpNotice \neq electrical\_failure\_battery\_mode) \\
-\end{schema}
-
-%Define the robust version of out of battery
-\begin{zed}
-  ROutOfBattery == OutOfBattery \lor OutOfBatteryWrongPreState
-\end{zed}
-
-This schema defines the charge battery operation.
-%Define the action of charging battery
-\begin{schema}{ChargeBattery}
-  \Delta Pump
-\where
-  batteryState' = charged \\
-  (powerState' = powerState = wall\_power \land pumpNotice = pumpNotice' = none) \lor \\
-  (powerState' = powerState = no\_power \land pumpNotice = electrical\_failure\_no\_battery \land \\
-  pumpNotice' = electrical\_failure\_battery\_mode) \\
-  lines' = lines \\
-  lockedState'= lockedState
-\end{schema}
-
-This schema defines the electrical failure recovery operation.
-%Define the electrical failure recovery opertaion
-\begin{schema}{ElectricalRepair}
-  \Delta Pump
-\where
-  pumpNotice \neq none \\
-  batteryState' = batteryState \\
-  powerState' = wall\_power \\
-  lines' = lines \\
-  pumpNotice' = none \\
-\end{schema}
-
-%Define the error condition where ElectricalRepair's pre-state
-%is wrong
-\begin{schema}{ElectricalRepairWrongPreState}
-  \Xi Pump
-\where
-  pumpNotice = none \\
-\end{schema}
-
-%Define the robust version of electrical repair
-\begin{zed}
-  RElectricalRepair == ElectricalRepair \lor ElectricalRepairWrongPreState
-\end{zed}
-
-%Defines error conditions.  ok means action was successful.
-%no\_power\_error means that the pump did not have power
-%\begin{zed}
-%  ErrorCheck ::= ok | no\_power\_error
-%\end{zed}
-
-
 
 The following are the initial states of a pump.
 %This schema defines a pump with one medicine line
@@ -347,14 +249,106 @@ The following are the initial states of a pump.
   alarm = silent \\
 \end{schema}
 
-%This schema defines how power effects dispensing medication.
-%Specifically, this case covers the situation where
-%the medicine is successful dispensed because a power
-%source is available.  This states the pump must have
-%power to dispense medicine
-%\begin{zed}
-%  DispenseMedicineWithPower == HasPower \land DispenseMedicine
-%\end{zed}
+\vspace{1cm}When an electrical failure happens, if the pump battery is properly charged, then it starts using battery. Otherwise, it will lose power.
+%Defines the conditions when there is an electrical failure.
+%In that case, the power state will transfer over to 
+%battery power if battery is charged, otherwise the pump will
+%lose power.
+\begin{schema}{ElectricalFailure}
+  \Delta Pump
+\where
+  powerState = wall\_power \\
+  pumpNotice = none \\
+  (batteryState = charged \land powerState' = battery\_power \land \\
+  pumpNotice = electrical\_failure\_battery\_mode) \lor \\
+  (batteryState = not\_properly\_charged \land powerState' = no\_power \land \\
+  pumpNotice = electrical\_failure\_no\_battery) \\
+  (lines' = lines) \land (batteryState' = batteryState) \land (lockedState'= lockedState)
+\end{schema}
+
+%Define the error condition where electrical failure's pre-powerState
+%is not wall\_power
+\begin{schema}{ElectricalFailureWrongPreState}
+  \Xi Pump
+\where
+  (powerState \neq wall\_power) \lor (pumpNotice \neq none)
+\end{schema}
+
+%Define the robust version of electrical failure
+\begin{zed}
+  RElectricalFailure == ElectricalFailure \lor ElectricalFailureWrongPreState
+\end{zed}
+
+\vspace{1cm}When the pump is out of battery, it loses power.
+%Define the condition when the battery runs of power
+\begin{schema}{OutOfBattery}
+  \Delta Pump
+\where
+  powerState = battery\_power \\
+  batteryState = charged \\
+  pumpNotice = electrical\_failure\_battery\_mode \\
+  powerState' = no\_power \\
+  batteryState' = not\_properly\_charged \\
+  pumpNotice' = electrical\_failure\_no\_battery \\
+  lines' = lines\\
+  lockedState'= lockedState
+\end{schema}
+
+%Define the error condition where OutOfBattery's pre-state
+%is not battery\_power or pre-batteryState is not charged
+\begin{schema}{OutOfBatteryWrongPreState}
+  \Xi Pump
+\where
+  (powerState \neq battery\_power) \lor (batteryState \neq charged) \lor \\
+  (pumpNotice \neq electrical\_failure\_battery\_mode) \\
+\end{schema}
+
+%Define the robust version of out of battery
+\begin{zed}
+  ROutOfBattery == OutOfBattery \lor OutOfBatteryWrongPreState
+\end{zed}
+
+\vspace{1cm}This schema defines the charge battery operation.
+%Define the action of charging battery
+\begin{schema}{ChargeBattery}
+  \Delta Pump
+\where
+  batteryState' = charged \\
+  (powerState' = powerState = wall\_power \land pumpNotice = pumpNotice' = none) \lor \\
+  (powerState' = powerState = no\_power \land pumpNotice = electrical\_failure\_no\_battery \land \\
+  pumpNotice' = electrical\_failure\_battery\_mode) \\
+  lines' = lines \\
+  lockedState'= lockedState
+\end{schema}
+
+\vspace{1cm}This schema defines the electrical failure recovery operation.
+%Define the electrical failure recovery opertaion
+\begin{schema}{ElectricalRepair}
+  \Delta Pump
+\where
+  pumpNotice \neq none \\
+  batteryState' = batteryState \\
+  powerState' = wall\_power \\
+  lines' = lines \\
+  pumpNotice' = none \\
+\end{schema}
+
+%Define the error condition where ElectricalRepair's pre-state
+%is wrong
+\begin{schema}{ElectricalRepairWrongPreState}
+  \Xi Pump
+\where
+  pumpNotice = none \\
+\end{schema}
+
+%Define the robust version of electrical repair
+\begin{zed}
+  RElectricalRepair == ElectricalRepair \lor ElectricalRepairWrongPreState
+\end{zed}
+
+\vspace{2cm}
+
+\item \textbf{Promotions}
 
 This is a frame for the operations performed in the line, 
 which basically says that everything on the pump will keep
@@ -400,6 +394,6 @@ FixOcclusionInLineInPump == FixOcclusion \land PromotionForLine\\
 DispenseMedicine == RDispenseMedicine \land PromotionForLine \land HasPower\\
 \end{zed}
 
-
+\end{enumerate}
 
 \end{document}

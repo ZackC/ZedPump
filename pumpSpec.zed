@@ -8,10 +8,13 @@
 
 This file covers the infusion pump project in the Models class
 
+
+
 This schema represents the current amount of medicine 
 on a specific line.
 \begin{schema}{MedicineLine}
   medicineAmount: \nat
+  
 \end{schema}
 
 The initial state of the medicine on a line is to be empty
@@ -99,14 +102,14 @@ of lines and a current power state.
 
 
 \begin{schema}{InitialSingleLinePump}
-  %Pump
+  MedicineLine \\
   lines : \seq MedicineLine \\
   %lines: \seq \nat \\
   powerState: PowerSupplyState \\
   %temp : MedicineLine 
 \where
   %temp = \theta InitMedicineLine \\
-  lines = \langle InitMedicineLine \rangle \\
+  lines = \langle (\theta InitMedicineLine) \rangle \\
   %lines = \langle 1 , 2 \rangle \\
   powerState = wall\_power \\
 \end{schema}

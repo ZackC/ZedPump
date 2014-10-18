@@ -115,11 +115,34 @@ of lines and a current power state.
   powerState = wall\_power \\
 \end{schema}
 
-\begin{schema}{PumpAddLine}
-  \Delta Pump \\
-  MedicineLine \\
+\begin{schema}{InitialDoubleLinePump}
+  %MedicineLine \\
+  %lines : \seq MedicineLine \\
+  %lines: \seq \nat \\
+  %powerState: PowerSupplyState \\
+  %temp : MedicineLine 
+  Pump \\
+  MedicineLine
 \where
-  lines' = lines \cat (\langle (\theta MedicineLine) \rangle)
+  %temp = \theta InitMedicineLine \\
+  lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
+  %lines = \langle 1 , 2 \rangle \\
+  powerState = wall\_power \\
+\end{schema}
+
+\begin{schema}{InitialTripleLinePump}
+  %MedicineLine \\
+  %lines : \seq MedicineLine \\
+  %lines: \seq \nat \\
+  %powerState: PowerSupplyState \\
+  %temp : MedicineLine 
+  Pump \\
+  MedicineLine
+\where
+  %temp = \theta InitMedicineLine \\
+  lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
+  %lines = \langle 1 , 2 \rangle \\
+  powerState = wall\_power \\
 \end{schema}
 
 %\begin{schema}{Pump}

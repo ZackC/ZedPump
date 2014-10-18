@@ -288,10 +288,15 @@ meaning: the pump has power if it does not have no power.
 %  DispenseMedicineWithPower == HasPower \land DispenseMedicine
 %\end{zed}
 
-
-
 Defines the conditions were the pump is locked
 \begin{schema}{IsLocked}
+  pumpIsLocked : LockedState
+\where
+  pumpIsLocked = locked
+\end{schema}
+
+Defines the conditions were the pump is locked
+\begin{schema}{LockPump}
   pumpIsLocked : LockedState
 \where
   pumpIsLocked = locked

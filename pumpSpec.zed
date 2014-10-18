@@ -102,11 +102,13 @@ of lines and a current power state.
 
 
 \begin{schema}{InitialSingleLinePump}
-  MedicineLine \\
-  lines : \seq MedicineLine \\
+  %MedicineLine \\
+  %lines : \seq MedicineLine \\
   %lines: \seq \nat \\
-  powerState: PowerSupplyState \\
+  %powerState: PowerSupplyState \\
   %temp : MedicineLine 
+  Pump \\
+  MedicineLine
 \where
   %temp = \theta InitMedicineLine \\
   lines = \langle (\theta InitMedicineLine) \rangle \\

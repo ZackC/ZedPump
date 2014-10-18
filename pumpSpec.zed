@@ -10,7 +10,7 @@ This file covers the infusion pump project in the Models class
 
 This type represents the different problems
 possible in the line.  occlusion means the 
-line is plugged or pinched.  out_of_medicine
+line is plugged or pinched.  out\_of\_medicine
 means that the line does not have 
 \begin{zed}
   Problem ::= occlusion | out\_of\_medicine
@@ -174,6 +174,12 @@ requires power
   BatteryState ::= charged | not\_properly\_charged
 \end{zed}
 
+LockedState is the state of the pump to know if it is locked or not.
+\begin{zed}
+  LockedState ::= locked | unlocked
+\end{zed}
+
+
 Defines the conditions were the pump has power:
 meaning: the pump has power if it does not have no power.
 (defined with double negative).
@@ -184,11 +190,12 @@ meaning: the pump has power if it does not have no power.
 \end{schema}
 
 %This schema defines a pump which contains a certain number
-%of lines and a current power state.
+%of lines and a current power state and a locked state
 \begin{schema}{Pump}
   lines : \seq MedicineLine \\
   powerState: PowerSupplyState \\
   batteryState: BatteryState \\
+  lockedState: LockedState\\
 \where
   lines \neq \emptyset
 \end{schema}
@@ -201,7 +208,7 @@ meaning: the pump has power if it does not have no power.
   \Delta Pump
 \where
   powerState = wall\_power \\
-  (batteryState = charged \land powerState' = battery\_power) \lor 
+  (batteryState = charged \land powerState' = battery\_power) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
   (lines' = lines) \land (batteryState' = batteryState)
 \end{schema}
@@ -236,6 +243,8 @@ meaning: the pump has power if it does not have no power.
 
 
 
+%This schema defines a pump with one medicine line
+%in initialized state
 \begin{schema}{InitialSingleLinePump}
   Pump \\
   MedicineLine
@@ -243,8 +252,11 @@ meaning: the pump has power if it does not have no power.
   lines = \langle (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
+%This schema defines a pump with two medicine lines 
+%in initialized state
 \begin{schema}{InitialDoubleLinePump}
   Pump \\
   MedicineLine
@@ -252,8 +264,11 @@ meaning: the pump has power if it does not have no power.
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
+%This schema defines a pump with three medicine lines 
+%in initialized state
 \begin{schema}{InitialTripleLinePump}
   Pump \\
   MedicineLine
@@ -261,6 +276,7 @@ meaning: the pump has power if it does not have no power.
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
 %This schema defines how power effects dispensing medication.
@@ -273,13 +289,6 @@ meaning: the pump has power if it does not have no power.
 %\end{zed}
 
 
-
-
-
-LockedState is the state of the pump to know if it is locked or not.
-\begin{zed}
-  LockedState ::= locked | not\_locked
-\end{zed}
 
 Defines the conditions were the pump is locked
 \begin{schema}{IsLocked}

@@ -10,7 +10,7 @@ This file covers the infusion pump project in the Models class
 
 
 
-This schema represents the current amount of medicine 
+This schema represents the current amount of medicine
 on a specific line.
 \begin{schema}{MedicineLine}
   medicineAmount: \nat
@@ -33,7 +33,7 @@ when it is filled up.
 
 
 The action modelling refilling the medicine in a line.
-It can be done at any time and fills the medicine 
+It can be done at any time and fills the medicine
 back up to the fillAmount.
 \begin{schema}{RefillLine}
   \Delta MedicineLine
@@ -41,7 +41,7 @@ back up to the fillAmount.
   medicineAmount' = fillAmount
 \end{schema}
 
-The dispense medicince action dispenses one unit of 
+The dispense medicince action dispenses one unit of
 medicine per action.  It requires that the amount
 of medicine in the line is greater than 0.
 \begin{schema}{DispenseMedicine}
@@ -73,7 +73,7 @@ meaning: the pump has power if it does not have no power.
 \end{schema}
 
 %Defines the conditions were the pump loses wall power.
-%In that case, the power state will transfer over to 
+%In that case, the power state will transfer over to
 %battery power.
 %\begin{schema}{WallPowerLoss}
   %powerState : PowerSupplyState
@@ -99,12 +99,13 @@ of lines and a current power state.
   lines \neq \emptyset
 \end{schema}
 
+
 \begin{schema}{InitialSingleLinePump}
   %MedicineLine \\
   %lines : \seq MedicineLine \\
   %lines: \seq \nat \\
   %powerState: PowerSupplyState \\
-  %temp : MedicineLine 
+  %temp : MedicineLine
   Pump \\
   MedicineLine
 \where
@@ -136,17 +137,9 @@ of lines and a current power state.
 
 
 
-LockedState is the state of the pump to know if it is locked or not.
-\begin{zed}
-  LockedState ::= locked | not\_locked
-\end{zed}
 
-Defines the conditions were the pump is locked
-\begin{schema}{IsLocked}
-  pumpIsLocked : LockedState
-\where
-  pumpIsLocked = locked
-\end{schema}
+
+
 
 
 

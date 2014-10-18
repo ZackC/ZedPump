@@ -1,0 +1,142 @@
+\documentclass{article}
+\usepackage{czt}
+
+\begin{document}
+\begin{zsection}
+  \SECTION pumpSpec \parents standard\_toolkit
+\end{zsection}
+
+This file covers the infusion pump project in the Models class
+
+This schema represents the current amount of medicine 
+on a specific line.
+\begin{schema}{MedicineLine}
+  medicineAmount: \nat
+\end{schema}
+
+The initial state of the medicine on a line is to be empty
+\begin{schema}{InitMedicineLine}
+  MedicineLine
+\where
+  medicineAmount = 0
+\end{schema}
+
+Defines the amount of medicine put in the line
+when it is filled up.
+\begin{axdef}
+  fillAmount: \nat
+\where
+  fillAmount = 2
+\end{axdef}
+
+
+The action modelling refilling the medicine in a line.
+It can be done at any time and fills the medicine 
+back up to the fillAmount.
+\begin{schema}{RefillLine}
+  \Delta MedicineLine
+\where
+  medicineAmount' = fillAmount
+\end{schema}
+
+The dispense medicince action dispenses one unit of 
+medicine per action.  It requires that the amount
+of medicine in the line is greater than 0.
+\begin{schema}{DispenseMedicine}
+  \Delta MedicineLine
+\where
+  medicineAmount > 0 \\
+  medicineAmount' = medicineAmount - 1
+\end{schema}
+
+PowerSupplyState is the type of power the pump is recieving.
+wall\_power corresponds to getting power from a wall socket,
+battery\_power corresponds to getting power from a battery,
+no\_power means the device has no power.
+\begin{zed}
+  PowerSupplyState ::= wall\_power | battery\_power | no\_power
+\end{zed}
+
+Refill medicine can be done in any power state but DispenseMedicine
+requires power
+
+
+Defines the conditions were the pump has power:
+meaning: the pump has power if it does not have no power.
+(defined with double negative).
+\begin{schema}{HasPower}
+  powerState : PowerSupplyState
+\where
+  powerState \neq no\_power
+\end{schema}
+
+%Defines the conditions were the pump loses wall power.
+%In that case, the power state will transfer over to 
+%battery power.
+%\begin{schema}{WallPowerLoss}
+  %powerState : PowerSupplyState
+%\where
+%  powerState = wall\_power \\
+%  powerState' = battery\_power
+%\end{schema}
+
+
+%Defines error conditions.  ok means action was successful.
+%no\_power\_error means that the pump did not have power
+%\begin{zed}
+%  ErrorCheck ::= ok | no\_power\_error
+%\end{zed}
+
+
+This schema defines a pump which contains a certain number
+of lines and a current power state.
+\begin{schema}{Pump}
+  lines : \seq MedicineLine \\
+  powerState: PowerSupplyState
+\where
+  lines \neq \emptyset
+\end{schema}
+
+
+\begin{schema}{InitialSingleLinePump}
+  %Pump
+  lines : \seq MedicineLine \\
+  %lines: \seq \nat \\
+  powerState: PowerSupplyState \\
+  %temp : MedicineLine 
+\where
+  %temp = \theta InitMedicineLine \\
+  lines = \langle InitMedicineLine \rangle \\
+  %lines = \langle 1 , 2 \rangle \\
+  powerState = wall\_power \\
+\end{schema}
+
+%\begin{schema}{Pump}
+%  %Pump
+%  line1 : MedicineLine \\
+%  line2 : MedicineLine \\
+%  line3 : MedicineLine \\
+%\where
+
+%\end{schema}
+
+%This schema defines how power effects dispensing medication.
+%Specifically, this case covers the situation where
+%the medicine is successful dispensed because a power
+%source is available.  This states the pump must have
+%power to dispense medicine
+%\begin{zed}
+%  DispenseMedicineWithPower == HasPower \land DispenseMedicine
+%\end{zed}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

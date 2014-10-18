@@ -115,6 +115,14 @@ of lines and a current power state.
   powerState = wall\_power \\
 \end{schema}
 
+\begin{schema}{PumpAddLine}
+  \Delta Pump \\
+  MedicineLine \\
+  line? : MedicineLine \\
+\where
+  lines' = lines \cat \theta(line?)
+\end{schema}
+
 %\begin{schema}{Pump}
 %  %Pump
 %  line1 : MedicineLine \\

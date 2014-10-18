@@ -14,7 +14,6 @@ This schema represents the current amount of medicine
 on a specific line.
 \begin{schema}{MedicineLine}
   medicineAmount: \nat
-  
 \end{schema}
 
 The initial state of the medicine on a line is to be empty

@@ -185,6 +185,7 @@ meaning: the pump has power if it does not have no power.
   powerState \neq no\_power
 \end{schema}
 
+This is the schema of a pump. A pump has a sequence of medicine lines, a power state (battery power, wall power, or no power), a batteryState (charged of not properly charged), and pump notice that visually notifies the caregiver, and a lock state.
 %This schema defines a pump which contains a certain number
 %of lines and a current power state and a locked state
 \begin{schema}{Pump}
@@ -192,12 +193,10 @@ meaning: the pump has power if it does not have no power.
   powerState: PowerSupplyState \\
   batteryState: BatteryState \\
   pumpNotice: PumpNotice \\
-  alarm: AlarmState \\
   lockedState: LockedState \\
 \where
   lines \neq \emptyset \\
   pumpNotice = none \\
-  alarm = silent \\
 \end{schema}
 
 When an electrical failure happens, if the pump battery is properly charged, then it starts using battery. Otherwise, it will lose power.
@@ -209,7 +208,6 @@ When an electrical failure happens, if the pump battery is properly charged, the
   \Delta Pump
 \where
   powerState = wall\_power \\
-  alarm = sounding \\
   (batteryState = charged \land powerState' = battery\_power \land \\
   pumpNotice = electrical\_failure\_battery\_mode) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power \land \\
@@ -238,7 +236,6 @@ When the pump is out of battery, it loses power.
   powerState = battery\_power \\
   batteryState = charged \\
   pumpNotice = electrical\_failure\_battery\_mode \\
-  alarm = alarm' = sounding \\
   powerState' = no\_power \\
   batteryState' = not\_properly\_charged \\
   pumpNotice' = electrical\_failure\_battery\_mode \\
@@ -265,10 +262,9 @@ This schema defines the charge battery operation.
   \Delta Pump
 \where
   batteryState' = charged \\
-  (powerState' = powerState = wall\_power \land alarm = alarm' = silent \land \\
-   pumpNotice = pumpNotice' = none) \lor \\
-  (powerState' = powerState = no\_power \land alarm = alarm' = sounding \land \\
-  pumpNotice = electrical\_failure\_no\_battery \land pumpNotice' = electrical\_failure\_battery\_mode) \\
+  (powerState' = powerState = wall\_power \land pumpNotice = pumpNotice' = none) \lor \\
+  (powerState' = powerState = no\_power \land pumpNotice = electrical\_failure\_no\_battery \land \\
+  pumpNotice' = electrical\_failure\_battery\_mode) \\
   lines' = lines\\
   lockedState'= lockedState
 \end{schema}
@@ -279,12 +275,10 @@ This schema defines the electrical failure recovery operation.
   \Delta Pump
 \where
   pumpNotice = electrical\_failure\_no\_battery \\
-  alarm = sounding \\
   powerState = no\_power \\
   batteryState' = batteryState = not\_properly\_charged \\
   powerState' = wall\_power \\
   pumpNotice' = none \\
-  alarm' = silent \\
 \end{schema}
   
 

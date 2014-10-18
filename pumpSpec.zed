@@ -8,14 +8,6 @@
 
 This file covers the infusion pump project in the Models class
 
-This type represents the different states
-of if the line is clear and 
-able to dispense if other conditions are 
-correct or blocked and not able to dispense
-\begin{zed}
-  ErrorState ::= clear | blocked % added this
-\end{zed}
-
 This type represents the different problems
 possible in the line.  occlusion means the 
 line is plugged or pinched.  out\_of\_medicine
@@ -32,6 +24,20 @@ If the alarm is silent then all is well.
   AlarmState ::= sounding | silent
 \end{zed}
 
+Defines the amount of medicine put in the line
+when it is filled up.
+\begin{axdef}
+  fillAmount: \nat
+\where
+  fillAmount = 2
+\end{axdef}
+
+Defines the initial rate when the system initializes
+\begin{axdef}
+  initRate: \nat
+\where
+  initRate = 1
+\end{axdef}
 
 This schema represents the current amount of medicine 
 on a specific line. The invariants ensure that in all
@@ -41,27 +47,34 @@ is silent.
 \begin{schema}{MedicineLine}
   medicineAmount: \nat \\
   currentProblems : \power Problem\\
-  alarm : AlarmState %added this
+  alarm : AlarmState \\
+  rate : \nat %added this
   \where
-  currentProblems \neq \emptyset \implies alarm = sounding\\ %added this
-  currentProblems = \emptyset \implies alarm = silent %added this
+  currentProblems \neq \emptyset \implies alarm = sounding\\
+  currentProblems = \emptyset \implies alarm = silent
 \end{schema}
 
 The initial state of the medicine on a line is to be empty
 \begin{schema}{InitMedicineLine}
   MedicineLine
 \where
+  rate = initRate \\ %added this
   medicineAmount = 0 \\
-  currentProblems = \emptyset %added this
+  currentProblems = \emptyset
 \end{schema}
 
-Defines the amount of medicine put in the line
-when it is filled up.
-\begin{axdef}
-  fillAmount: \nat
+This function takes a new rate for the machine to dispense
+medicine at and sets it to be the current rate.
+All other variables remain the same.
+\begin{schema}{SetRate}
+  \Delta MedicineLine\\
+  newRate? : \nat
 \where
-  fillAmount = 2
-\end{axdef}
+  rate' = newRate?\\
+  medicineAmount' = medicineAmount\\
+  currentProblems' = currentProblems\\
+  alarm' = alarm
+\end{schema}
 
 
 The action modelling refilling the medicine in a line.
@@ -71,15 +84,17 @@ back up to the fillAmount.
   \Delta MedicineLine
 \where
   medicineAmount' = fillAmount \\
-  currentProblems' = currentProblems \setminus \{out\_of\_medicine\} %added this
+  currentProblems' = currentProblems \setminus \{out\_of\_medicine\}\\
+  rate' = rate %added this
 \end{schema}
 
-\begin{schema}{FixOcclusion} %added this
+\begin{schema}{FixOcclusion}
   \Delta MedicineLine
 \where
   occlusion \in currentProblems\\
   currentProblems' = currentProblems \setminus \{occlusion\}\\
-  medicineAmount' = medicineAmount
+  medicineAmount' = medicineAmount\\
+  rate' = rate %added this
 \end{schema}
 
 The dispense medicince action dispenses one unit of 
@@ -90,39 +105,43 @@ of medicine in the line is greater than 0.
 \where
   currentProblems = \emptyset\\
   medicineAmount > 0 \\
-  medicineAmount' = medicineAmount - 1 \\ % added this
+  (medicineAmount \geq rate \land medicineAmount' = medicineAmount - rate) \lor\\ %added this
+  (medicineAmount < rate \land medicineAmount' = 0)\\ %added this
+  rate' = rate\\ %added this
   currentProblems' = currentProblems
 \end{schema}
 
 This function models the medicine dispensing becoming 
 blocked.  The schema has the same pre states as the 
 SuccessfulDispenseMedicine schema
-\begin{schema}{DispenseMedicineGetsBlocked} % added this
+\begin{schema}{DispenseMedicineGetsBlocked} 
   \Delta MedicineLine
 \where
   currentProblems = \emptyset\\
   medicineAmount > 0 \\
-  medicineAmount' = medicineAmount \\ % added this
-  currentProblems' = currentProblems \cup \{occlusion\}  % added this
+  medicineAmount' = medicineAmount \\
+  rate' = rate\\ 
+  currentProblems' = currentProblems \cup \{occlusion\}  
 \end{schema}
 
 
 This function modles the line attempting to
 dispense medicine while the line is out of 
 medicine. 
-\begin{schema}{AttemptDispenseWhenOutOfMedicine} % added this
-    \Delta MedicineLine
+\begin{schema}{AttemptDispenseWhenOutOfMedicine} 
+  	\Delta MedicineLine
 \where
   currentProblems = \emptyset\\
-    medicineAmount = 0\\
-    medicineAmount' = medicineAmount\\
-    currentProblems' = currentProblems \cup \{out\_of\_medicine\}
+	medicineAmount = 0\\
+	medicineAmount' = medicineAmount\\
+	rate' = rate\\ %added this
+	currentProblems' = currentProblems \cup \{out\_of\_medicine\}
 \end{schema}
 
 This schema prevents dispensing any medicine
 when there is a problem.
-\begin{schema}{AttemptDispenseWithProblem} % added this
-    \Xi MedicineLine
+\begin{schema}{AttemptDispenseWithProblem} 
+  	\Xi MedicineLine
 \where
   currentProblems \neq \emptyset\\
 \end{schema}
@@ -131,12 +150,12 @@ This schema represents the ability of the line to become
 blocked while dispensing but also allows the line to 
 dispense medicince successfully.
 \begin{zed}
-  NonDeterministicDispenseMedicine == SuccessfulDispenseMedicine \lor DispenseMedicineGetsBlocked % added this 
+  NonDeterministicDispenseMedicine == SuccessfulDispenseMedicine \lor DispenseMedicineGetsBlocked  
 \end{zed}
 
 This schema represents all possible outcomes when trying to
 dispense medicine under various conditions.
-\begin{zed} %added this
+\begin{zed} 
   RDispenseMedicine == NonDeterministicDispenseMedicine \lor AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
 \end{zed}
 
@@ -155,6 +174,12 @@ requires power
   BatteryState ::= charged | not\_properly\_charged
 \end{zed}
 
+LockedState is the state of the pump to know if it is locked or not.
+\begin{zed}
+  LockedState ::= locked | unlocked
+\end{zed}
+
+
 Defines the conditions were the pump has power:
 meaning: the pump has power if it does not have no power.
 (defined with double negative).
@@ -165,11 +190,12 @@ meaning: the pump has power if it does not have no power.
 \end{schema}
 
 %This schema defines a pump which contains a certain number
-%of lines and a current power state.
+%of lines and a current power state and a locked state
 \begin{schema}{Pump}
   lines : \seq MedicineLine \\
   powerState: PowerSupplyState \\
   batteryState: BatteryState \\
+  lockedState: LockedState\\
 \where
   lines \neq \emptyset
 \end{schema}
@@ -251,6 +277,7 @@ end{zed}
   lines = \langle (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
 %This schema defines a pump with two medicine lines 
@@ -262,6 +289,7 @@ end{zed}
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
 %This schema defines a pump with three medicine lines 
@@ -273,6 +301,7 @@ end{zed}
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
+  lockedState = unlocked
 \end{schema}
 
 %This schema defines how power effects dispensing medication.
@@ -284,13 +313,15 @@ end{zed}
 %  DispenseMedicineWithPower == HasPower \land DispenseMedicine
 %\end{zed}
 
-LockedState is the state of the pump to know if it is locked or not.
-\begin{zed}
-  LockedState ::= locked | not\_locked
-\end{zed}
-
 Defines the conditions were the pump is locked
 \begin{schema}{IsLocked}
+  pumpIsLocked : LockedState
+\where
+  pumpIsLocked = locked
+\end{schema}
+
+Defines the conditions were the pump is locked
+\begin{schema}{LockPump}
   pumpIsLocked : LockedState
 \where
   pumpIsLocked = locked

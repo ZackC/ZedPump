@@ -99,6 +99,7 @@ of lines and a current power state.
   lines \neq \emptyset
 \end{schema}
 
+
 \begin{schema}{InitialSingleLinePump}
   %MedicineLine \\
   %lines : \seq MedicineLine \\
@@ -136,17 +137,9 @@ of lines and a current power state.
 
 
 
-LockedState is the state of the pump to know if it is locked or not.
-\begin{zed}
-  LockedState ::= locked | not\_locked
-\end{zed}
 
-Defines the conditions were the pump is locked
-\begin{schema}{IsLocked}
-  pumpIsLocked : LockedState
-\where
-  pumpIsLocked = locked
-\end{schema}
+
+
 
 
 

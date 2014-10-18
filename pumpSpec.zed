@@ -118,9 +118,8 @@ of lines and a current power state.
 \begin{schema}{PumpAddLine}
   \Delta Pump \\
   MedicineLine \\
-  line? : MedicineLine \\
 \where
-  lines' = lines \cat \theta(line?)
+  lines' = lines \cat (\langle (\theta MedicineLine) \rangle)
 \end{schema}
 
 %\begin{schema}{Pump}

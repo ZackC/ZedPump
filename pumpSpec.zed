@@ -273,6 +273,21 @@ This schema defines the charge battery operation.
   lockedState'= lockedState
 \end{schema}
 
+This schema defines the electrical failure recovery operation.
+%Define the electrical failure recovery opertaion
+\begin{schema}{ElectricalRepair}
+  \Delta Pump
+\where
+  pumpNotice = electrical\_failure\_no\_battery \\
+  alarm = sounding \\
+  powerState = no\_power \\
+  batteryState' = batteryState = not\_properly\_charged \\
+  powerState' = wall\_power \\
+  pumpNotice' = none \\
+  alarm' = silent \\
+\end{schema}
+  
+
 %Defines error conditions.  ok means action was successful.
 %no\_power\_error means that the pump did not have power
 %\begin{zed}

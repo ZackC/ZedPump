@@ -158,7 +158,7 @@ dispense medicine under various conditions.
   RDispenseMedicine == NonDeterministicDispenseMedicine \lor AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
 \end{zed}
 
-PowerSupplyState is the type of power the pump is recieving.
+PowerSupplyState is the type of power the pump is receiving.
 wall\_power corresponds to getting power from a wall socket,
 battery\_power corresponds to getting power from a battery,
 no\_power means the device has no power.
@@ -166,18 +166,14 @@ no\_power means the device has no power.
   PowerSupplyState ::= wall\_power | battery\_power | no\_power
 \end{zed}
 
-Refill medicine can be done in any power state but DispenseMedicine
-requires power
-
+BatteryState is the possible states that the pump battery could be in.
 \begin{zed}
   BatteryState ::= charged | not\_properly\_charged
 \end{zed}
 
-LockedState is the state of the pump to know if it is locked or not.
 \begin{zed}
   LockedState ::= locked | unlocked
 \end{zed}
-
 
 Defines the conditions were the pump has power:
 meaning: the pump has power if it does not have no power.
@@ -199,6 +195,7 @@ meaning: the pump has power if it does not have no power.
   lines \neq \emptyset
 \end{schema}
 
+When an electrical failure happens, if the pump battery is properly charged, then it starts using battery. Otherwise, it will lose power.
 %Defines the conditions when there is an electrical failure.
 %In that case, the power state will transfer over to 
 %battery power if battery is charged, otherwise the pump will
@@ -225,6 +222,7 @@ meaning: the pump has power if it does not have no power.
   RElectricalFailure == ElectricalFailure \lor ElectricalFailureWrongPreState
 \end{zed}
 
+When the pump is out of battery, it loses power.
 %Define the condition when the battery runs of power
 \begin{schema}{OutOfBattery}
   \Delta Pump
@@ -250,6 +248,7 @@ meaning: the pump has power if it does not have no power.
   ROutOfBattery == OutOfBattery \lor OutOfBatteryWrongPreState
 \end{zed}
 
+This schema defines the charge battery operation.
 %Define the action of charging battery
 \begin{schema}{ChargeBattery}
   \Delta Pump
@@ -268,7 +267,7 @@ meaning: the pump has power if it does not have no power.
 
 
 
-
+The following are the initial states of a pump.
 %This schema defines a pump with one medicine line
 %in initialized state
 \begin{schema}{InitialSingleLinePump}
@@ -314,6 +313,7 @@ meaning: the pump has power if it does not have no power.
 %  DispenseMedicineWithPower == HasPower \land DispenseMedicine
 %\end{zed}
 
+<<<<<<< HEAD
 This is a frame for the operations performed in the line, 
 which basically says that everything on the pump will keep
 the same and only the line will change

@@ -75,6 +75,16 @@ meaning: the pump has power if it does not have no power.
   powerState \neq no\_power
 \end{schema}
 
+%This schema defines a pump which contains a certain number
+%of lines and a current power state.
+\begin{schema}{Pump}
+  lines : \seq MedicineLine \\
+  powerState: PowerSupplyState \\
+  batteryState: BatteryState \\
+\where
+  lines \neq \emptyset
+\end{schema}
+
 %Defines the conditions when there is an electrical failure.
 %In that case, the power state will transfer over to 
 %battery power if battery is charged, otherwise the pump will
@@ -116,15 +126,7 @@ meaning: the pump has power if it does not have no power.
 %\end{zed}
 
 
-%This schema defines a pump which contains a certain number
-%of lines and a current power state.
-\begin{schema}{Pump}
-  lines : \seq MedicineLine \\
-  powerState: PowerSupplyState \\
-  batteryState: BatteryState \\
-\where
-  lines \neq \emptyset
-\end{schema}
+
 
 
 \begin{schema}{InitialSingleLinePump}

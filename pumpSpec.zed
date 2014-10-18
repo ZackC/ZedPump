@@ -162,8 +162,8 @@ dispense medicine under various conditions.
   AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
 \end{zed}
 
-\vspace{2cm}
-\item \textbf{Pump Specification}
+\newpage
+\item\textbf{Pump Specification}
 PowerSupplyState is the type of power the pump is receiving.
 wall\_power corresponds to getting power from a wall socket,
 battery\_power corresponds to getting power from a battery,
@@ -346,8 +346,7 @@ The following are the initial states of a pump.
   RElectricalRepair == ElectricalRepair \lor ElectricalRepairWrongPreState
 \end{zed}
 
-\vspace{2cm}
-
+\newpage
 \item \textbf{Promotions}
 
 This is a frame for the operations performed in the line, 

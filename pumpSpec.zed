@@ -76,7 +76,6 @@ All other variables remain the same.
   alarm' = alarm
 \end{schema}
 
-
 The action modelling refilling the medicine in a line.
 It can be done at any time and fills the medicine 
 back up to the fillAmount.
@@ -315,19 +314,46 @@ meaning: the pump has power if it does not have no power.
 %  DispenseMedicineWithPower == HasPower \land DispenseMedicine
 %\end{zed}
 
-Defines the conditions were the pump is locked
+This is a frame for the operations performed in the line, 
+which basically says that everything on the pump will keep
+the same and only the line will change
+\begin{schema}{LineOp}
+  \Delta Pump
+\where
+  powerState = powerState' \\
+  batteryState = batteryState' \\
+  lockedState = lockedState'\\
+\end{schema}
+
+Promotion for Line
+\begin{schema}{PromotionForLine}
+  LineOp\\
+  \Delta MedicineLine\\
+  numberOfLine? : \nat  
+\where
+  numberOfLine? > 0 \land numberOfLine? < \# lines \\
+  lines(numberOfLine?) = \theta MedicineLine\\
+  lines'= lines \oplus \{numberOfLine? \mapsto \theta MedicineLine\}
+\end{schema}
+
+Preconditions the pump to be locked
 \begin{schema}{IsLocked}
   pumpIsLocked : LockedState
 \where
   pumpIsLocked = locked
 \end{schema}
 
-Defines the conditions were the pump is locked
-\begin{schema}{LockPump}
-  Pump
+Preconditions the pump to be unlocked
+\begin{schema}{IsUnlocked}
+  pumpIsLocked : LockedState
 \where
-  lockedState = locked
+  pumpIsLocked = unlocked
 \end{schema}
+
+
+\begin{zed}
+SetRateForLineInPump == SetRate \land PromotionForLine \land IsUnlocked
+\end{zed}
 
 
 

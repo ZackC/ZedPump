@@ -253,10 +253,6 @@ meaning: the pump has power if it does not have no power.
 %  DispenseMedicineWithPower == HasPower \land DispenseMedicine
 %\end{zed}
 
-
-
-
-
 LockedState is the state of the pump to know if it is locked or not.
 \begin{zed}
   LockedState ::= locked | not\_locked

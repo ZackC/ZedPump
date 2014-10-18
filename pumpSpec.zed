@@ -111,18 +111,18 @@ This function modles the line attempting to
 dispense medicine while the line is out of 
 medicine. 
 \begin{schema}{AttemptDispenseWhenOutOfMedicine} % added this
-  	\Delta MedicineLine
+    \Delta MedicineLine
 \where
   currentProblems = \emptyset\\
-	medicineAmount = 0\\
-	medicineAmount' = medicineAmount\\
-	currentProblems' = currentProblems \cup \{out\_of\_medicine\}
+    medicineAmount = 0\\
+    medicineAmount' = medicineAmount\\
+    currentProblems' = currentProblems \cup \{out\_of\_medicine\}
 \end{schema}
 
 This schema prevents dispensing any medicine
 when there is a problem.
 \begin{schema}{AttemptDispenseWithProblem} % added this
-  	\Xi MedicineLine
+    \Xi MedicineLine
 \where
   currentProblems \neq \emptyset\\
 \end{schema}
@@ -187,6 +187,19 @@ meaning: the pump has power if it does not have no power.
   (lines' = lines) \land (batteryState' = batteryState)
 \end{schema}
 
+%Define the error condition where electrical failure's pre-powerState
+%is not wall\_power
+\begin{schema}{ElectricalFailureWrongPreState}
+  \Xi Pump
+\where
+  powerState \neq wall\_power
+\end{schema}
+
+%Define the robust version of electrical failure
+\begin{zed}
+  RElectricalFailure == ElectricalFailure \lor ElectricalFailureWrongPreState
+\end{zed}
+
 %Define the condition when the battery runs of power
 \begin{schema}{OutOfBattery}
   \Delta Pump
@@ -198,6 +211,19 @@ meaning: the pump has power if it does not have no power.
   lines' = lines
 \end{schema}
 
+%Define the error condition where OutOfBattery's pre-powerState
+%is not battery\_power or pre-batteryState is not charged
+\begin{schema}{OutOfBatteryWrongPreState}
+  \Xi Pump
+\where
+  (powerState \neq battery\_power) \lor (batteryState \neq charged)
+\end{schema}
+
+%Define the robust version of out of battery
+begin{zed}
+  ROutOfBattery == OutOfBattery \lor OutOfBatteryWrongPreState
+end{zed}
+
 %Define the action of charging battery
 \begin{schema}{ChargeBattery}
   \Delta Pump
@@ -206,7 +232,6 @@ meaning: the pump has power if it does not have no power.
   powerState' = powerState \\
   lines' = lines
 \end{schema}
-
 
 %Defines error conditions.  ok means action was successful.
 %no\_power\_error means that the pump did not have power

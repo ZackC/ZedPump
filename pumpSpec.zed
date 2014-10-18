@@ -129,19 +129,19 @@ This function modles the line attempting to
 dispense medicine while the line is out of 
 medicine. 
 \begin{schema}{AttemptDispenseWhenOutOfMedicine} 
-  	\Delta MedicineLine
+    \Delta MedicineLine
 \where
   currentProblems = \emptyset\\
-	medicineAmount = 0\\
-	medicineAmount' = medicineAmount\\
-	rate' = rate\\ %added this
-	currentProblems' = currentProblems \cup \{out\_of\_medicine\}
+    medicineAmount = 0\\
+    medicineAmount' = medicineAmount\\
+    rate' = rate\\ %added this
+    currentProblems' = currentProblems \cup \{out\_of\_medicine\}
 \end{schema}
 
 This schema prevents dispensing any medicine
 when there is a problem.
 \begin{schema}{AttemptDispenseWithProblem} 
-  	\Xi MedicineLine
+    \Xi MedicineLine
 \where
   currentProblems \neq \emptyset\\
 \end{schema}
@@ -246,9 +246,9 @@ meaning: the pump has power if it does not have no power.
 \end{schema}
 
 %Define the robust version of out of battery
-begin{zed}
+\begin{zed}
   ROutOfBattery == OutOfBattery \lor OutOfBatteryWrongPreState
-end{zed}
+\end{zed}
 
 %Define the action of charging battery
 \begin{schema}{ChargeBattery}

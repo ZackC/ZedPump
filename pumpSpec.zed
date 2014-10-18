@@ -208,6 +208,7 @@ When an electrical failure happens, if the pump battery is properly charged, the
   \Delta Pump
 \where
   powerState = wall\_power \\
+  pumpNotice = none \\
   (batteryState = charged \land powerState' = battery\_power \land \\
   pumpNotice = electrical\_failure\_battery\_mode) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power \land \\
@@ -220,7 +221,7 @@ When an electrical failure happens, if the pump battery is properly charged, the
 \begin{schema}{ElectricalFailureWrongPreState}
   \Xi Pump
 \where
-  powerState \neq wall\_power
+  (powerState \neq wall\_power) \lor (pumpNotice \neq none)
 \end{schema}
 
 %Define the robust version of electrical failure
@@ -238,17 +239,18 @@ When the pump is out of battery, it loses power.
   pumpNotice = electrical\_failure\_battery\_mode \\
   powerState' = no\_power \\
   batteryState' = not\_properly\_charged \\
-  pumpNotice' = electrical\_failure\_battery\_mode \\
+  pumpNotice' = electrical\_failure\_no\_battery \\
   lines' = lines\\
   lockedState'= lockedState
 \end{schema}
 
-%Define the error condition where OutOfBattery's pre-powerState
+%Define the error condition where OutOfBattery's pre-state
 %is not battery\_power or pre-batteryState is not charged
 \begin{schema}{OutOfBatteryWrongPreState}
   \Xi Pump
 \where
-  (powerState \neq battery\_power) \lor (batteryState \neq charged)
+  (powerState \neq battery\_power) \lor (batteryState \neq charged) \lor \\
+  (pumpNotice \neq electrical\_failure\_battery\_mode) \\
 \end{schema}
 
 %Define the robust version of out of battery
@@ -265,7 +267,7 @@ This schema defines the charge battery operation.
   (powerState' = powerState = wall\_power \land pumpNotice = pumpNotice' = none) \lor \\
   (powerState' = powerState = no\_power \land pumpNotice = electrical\_failure\_no\_battery \land \\
   pumpNotice' = electrical\_failure\_battery\_mode) \\
-  lines' = lines\\
+  lines' = lines \\
   lockedState'= lockedState
 \end{schema}
 
@@ -274,13 +276,25 @@ This schema defines the electrical failure recovery operation.
 \begin{schema}{ElectricalRepair}
   \Delta Pump
 \where
-  pumpNotice = electrical\_failure\_no\_battery \\
-  powerState = no\_power \\
-  batteryState' = batteryState = not\_properly\_charged \\
+  pumpNotice \neq none \\
+  batteryState' = batteryState \\
   powerState' = wall\_power \\
+  lines' = lines \\
   pumpNotice' = none \\
 \end{schema}
-  
+
+%Define the error condition where ElectricalRepair's pre-state
+%is wrong
+\begin{schema}{ElectricalRepairWrongPreState}
+  \Xi Pump
+\where
+  pumpNotice = none \\
+\end{schema}
+
+%Define the robust version of electrical repair
+\begin{zed}
+  RElectricalRepair == ElectricalRepair \lor ElectricalRepairWrongPreState
+\end{zed}
 
 %Defines error conditions.  ok means action was successful.
 %no\_power\_error means that the pump did not have power

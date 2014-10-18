@@ -24,14 +24,27 @@ means that the line does not have
   Problem ::= occlusion | out\_of\_medicine
 \end{zed}
 
+This type represents the possible states of the
+alarm for the line. If the alarm is sounding,
+it means there exists a problem with the line.
+If the alarm is silent then all is well.
+\begin{zed}
+  AlarmState ::= sounding | silent
+\end{zed}
 
 
 This schema represents the current amount of medicine 
-on a specific line.
+on a specific line. The invariants ensure that in all
+cases where the line has a problem, the alarm is sounding
+and in all cases where the line has no problems, the alarm
+is silent.
 \begin{schema}{MedicineLine}
   medicineAmount: \nat \\
-  blockedCheck : ErrorState \\% added this
-  currentProblems : \power Problem
+  currentProblems : \power Problem\\
+  alarm : AlarmState %added this
+  \where
+  currentProblems \neq \emptyset \implies alarm = sounding\\ %added this
+  currentProblems = \emptyset \implies alarm = silent %added this
 \end{schema}
 
 The initial state of the medicine on a line is to be empty
@@ -39,7 +52,6 @@ The initial state of the medicine on a line is to be empty
   MedicineLine
 \where
   medicineAmount = 0 \\
-  blockedCheck = clear \\% added this
   currentProblems = \emptyset %added this
 \end{schema}
 
@@ -59,8 +71,15 @@ back up to the fillAmount.
   \Delta MedicineLine
 \where
   medicineAmount' = fillAmount \\
-  blockedCheck' = blockedCheck \\ %added this
-  currentProblems' = currentProblems %added this
+  currentProblems' = currentProblems \setminus \{out\_of\_medicine\} %added this
+\end{schema}
+
+\begin{schema}{FixOcclusion} %added this
+  \Delta MedicineLine
+\where
+  occlusion \in currentProblems\\
+  currentProblems' = currentProblems \setminus \{occlusion\}\\
+  medicineAmount' = medicineAmount
 \end{schema}
 
 The dispense medicince action dispenses one unit of 
@@ -69,11 +88,10 @@ of medicine in the line is greater than 0.
 \begin{schema}{SuccessfulDispenseMedicine}
   \Delta MedicineLine
 \where
+  currentProblems = \emptyset\\
   medicineAmount > 0 \\
-  blockedCheck = clear \\ % added this
   medicineAmount' = medicineAmount - 1 \\ % added this
-  blockedCheck' = clear  % added this
-  
+  currentProblems' = currentProblems
 \end{schema}
 
 This function models the medicine dispensing becoming 
@@ -82,10 +100,31 @@ SuccessfulDispenseMedicine schema
 \begin{schema}{DispenseMedicineGetsBlocked} % added this
   \Delta MedicineLine
 \where
+  currentProblems = \emptyset\\
   medicineAmount > 0 \\
-  blockedCheck = clear \\ % added this
   medicineAmount' = medicineAmount \\ % added this
-  blockedCheck' = blocked   % added this
+  currentProblems' = currentProblems \cup \{occlusion\}  % added this
+\end{schema}
+
+
+This function modles the line attempting to
+dispense medicine while the line is out of 
+medicine. 
+\begin{schema}{AttemptDispenseWhenOutOfMedicine} % added this
+  	\Delta MedicineLine
+\where
+  currentProblems = \emptyset\\
+	medicineAmount = 0\\
+	medicineAmount' = medicineAmount\\
+	currentProblems' = currentProblems \cup \{out\_of\_medicine\}
+\end{schema}
+
+This schema prevents dispensing any medicine
+when there is a problem.
+\begin{schema}{AttemptDispenseWithProblem} % added this
+  	\Xi MedicineLine
+\where
+  currentProblems \neq \emptyset\\
 \end{schema}
 
 This schema represents the ability of the line to become
@@ -95,6 +134,11 @@ dispense medicince successfully.
   NonDeterministicDispenseMedicine == SuccessfulDispenseMedicine \lor DispenseMedicineGetsBlocked % added this 
 \end{zed}
 
+This schema represents all possible outcomes when trying to
+dispense medicine under various conditions.
+\begin{zed} %added this
+  RDispenseMedicine == NonDeterministicDispenseMedicine \lor AttemptDispenseWhenOutOfMedicine \lor AttemptDispenseWithProblem
+\end{zed}
 
   
 

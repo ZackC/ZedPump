@@ -217,7 +217,6 @@ meaning: the pump has power if it does not have no power.
 
 
 
-
 \begin{schema}{InitialSingleLinePump}
   Pump \\
   MedicineLine
@@ -258,9 +257,17 @@ meaning: the pump has power if it does not have no power.
 
 
 
+LockedState is the state of the pump to know if it is locked or not.
+\begin{zed}
+  LockedState ::= locked | not\_locked
+\end{zed}
 
-
-
+Defines the conditions were the pump is locked
+\begin{schema}{IsLocked}
+  pumpIsLocked : LockedState
+\where
+  pumpIsLocked = locked
+\end{schema}
 
 
 

@@ -210,7 +210,7 @@ meaning: the pump has power if it does not have no power.
   powerState = wall\_power \\
   (batteryState = charged \land powerState' = battery\_power) \lor \\
   (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
-  (lines' = lines) \land (batteryState' = batteryState)
+  (lines' = lines) \land   (batteryState' = batteryState) \land  (lockedState'= lockedState)
 \end{schema}
 
 %Define the error condition where electrical failure's pre-powerState
@@ -234,7 +234,8 @@ meaning: the pump has power if it does not have no power.
   batteryState = charged \\
   powerState' = no\_power \\
   batteryState = not\_properly\_charged \\
-  lines' = lines
+  lines' = lines\\
+  lockedState'= lockedState
 \end{schema}
 
 %Define the error condition where OutOfBattery's pre-powerState
@@ -256,7 +257,8 @@ meaning: the pump has power if it does not have no power.
 \where
   batteryState' = charged \\
   powerState' = powerState \\
-  lines' = lines
+  lines' = lines\\
+  lockedState'= lockedState
 \end{schema}
 
 %Defines error conditions.  ok means action was successful.
@@ -322,9 +324,9 @@ Defines the conditions were the pump is locked
 
 Defines the conditions were the pump is locked
 \begin{schema}{LockPump}
-  pumpIsLocked : LockedState
+  Pump
 \where
-  pumpIsLocked = locked
+  lockedState = locked
 \end{schema}
 
 

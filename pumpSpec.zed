@@ -172,6 +172,9 @@ BatteryState is the possible states that the pump battery could be in.
   BatteryState ::= charged | not\_properly\_charged
 \end{zed}
 
+\begin{zed}
+  PumpNotice ::= electrical\_failure\_battery\_mode | electrical\_failure\_no\_battery | none
+\end{zed}
 
 Defines the conditions were the pump has power:
 meaning: the pump has power if it does not have no power.
@@ -188,9 +191,13 @@ meaning: the pump has power if it does not have no power.
   lines : \seq MedicineLine \\
   powerState: PowerSupplyState \\
   batteryState: BatteryState \\
-  lockedState: LockedState\\
+  pumpNotice: PumpNotice \\
+  alarm: AlarmState \\
+  lockedState: LockedState \\
 \where
-  lines \neq \emptyset
+  lines \neq \emptyset \\
+  pumpNotice = none \\
+  alarm = silent \\
 \end{schema}
 
 When an electrical failure happens, if the pump battery is properly charged, then it starts using battery. Otherwise, it will lose power.
@@ -202,9 +209,12 @@ When an electrical failure happens, if the pump battery is properly charged, the
   \Delta Pump
 \where
   powerState = wall\_power \\
-  (batteryState = charged \land powerState' = battery\_power) \lor \\
-  (batteryState = not\_properly\_charged \land powerState' = no\_power) \\
-  (lines' = lines) \land   (batteryState' = batteryState) \land  (lockedState'= lockedState)
+  alarm = sounding \\
+  (batteryState = charged \land powerState' = battery\_power \land \\
+  pumpNotice = electrical\_failure\_battery\_mode) \lor \\
+  (batteryState = not\_properly\_charged \land powerState' = no\_power \land \\
+  pumpNotice = electrical\_failure\_no\_battery) \\
+  (lines' = lines) \land (batteryState' = batteryState) \land (lockedState'= lockedState)
 \end{schema}
 
 %Define the error condition where electrical failure's pre-powerState
@@ -227,8 +237,11 @@ When the pump is out of battery, it loses power.
 \where
   powerState = battery\_power \\
   batteryState = charged \\
+  pumpNotice = electrical\_failure\_battery\_mode \\
+  alarm = alarm' = sounding \\
   powerState' = no\_power \\
-  batteryState = not\_properly\_charged \\
+  batteryState' = not\_properly\_charged \\
+  pumpNotice' = electrical\_failure\_battery\_mode \\
   lines' = lines\\
   lockedState'= lockedState
 \end{schema}
@@ -252,7 +265,10 @@ This schema defines the charge battery operation.
   \Delta Pump
 \where
   batteryState' = charged \\
-  powerState' = powerState \\
+  (powerState' = powerState = wall\_power \land alarm = alarm' = silent \land \\
+   pumpNotice = pumpNotice' = none) \lor \\
+  (powerState' = powerState = no\_power \land alarm = alarm' = sounding \land \\
+  pumpNotice = electrical\_failure\_no\_battery \land pumpNotice' = electrical\_failure\_battery\_mode) \\
   lines' = lines\\
   lockedState'= lockedState
 \end{schema}
@@ -275,7 +291,9 @@ The following are the initial states of a pump.
   lines = \langle (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
-  lockedState = unlocked
+  lockedState = unlocked \\
+  pumpNotice = none \\
+  alarm = silent \\
 \end{schema}
 
 %This schema defines a pump with two medicine lines 
@@ -287,7 +305,9 @@ The following are the initial states of a pump.
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
-  lockedState = unlocked
+  lockedState = unlocked \\
+  pumpNotice = none \\
+  alarm = silent \\
 \end{schema}
 
 %This schema defines a pump with three medicine lines 
@@ -299,7 +319,9 @@ The following are the initial states of a pump.
   lines = \langle (\theta InitMedicineLine), (\theta InitMedicineLine), (\theta InitMedicineLine) \rangle \\
   powerState = wall\_power \\
   batteryState = not\_properly\_charged \\
-  lockedState = unlocked
+  lockedState = unlocked \\
+  pumpNotice = none \\
+  alarm = silent \\
 \end{schema}
 
 %This schema defines how power effects dispensing medication.
